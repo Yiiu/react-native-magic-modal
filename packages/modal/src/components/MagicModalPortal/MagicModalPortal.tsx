@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
 } from "react";
 import { BackHandler, Platform, StyleSheet, View } from "react-native";
 /** Do not import FullWindowOverlay from react-native-screens directly, as it screws up code splitting */
@@ -17,7 +18,7 @@ import type {
 } from "../../constants/types";
 import { defaultConfig } from "../../constants/defaultConfig";
 import { MagicModalHideReason } from "../../constants/types";
-import { magicModalRef } from "../../utils/magicModalHandler";
+import { registerPortal, unregisterPortal, type IModal } from "../../utils/magicModalHandler";
 import { MagicModal } from "../MagicModal";
 import { MagicModalProvider } from "../MagicModalProvider";
 
@@ -49,8 +50,9 @@ interface ModalStackItem {
  */
 export const MagicModalPortal: React.FC = memo(() => {
   const [modals, setModals] = React.useState<ModalStackItem[]>([]);
-  const [fullWindowOverlayEnabled, setFullWindowOverlayEnabled] =
-    React.useState(true);
+  const [fullWindowOverlayEnabled, setFullWindowOverlayEnabled] = React.useState(true);
+  // 创建本地ref，不再使用全局的magicModalRef
+  const localRef = useRef<IModal>(null);
 
   const disableFullWindowOverlay = useCallback(() => {
     setFullWindowOverlayEnabled(false);
@@ -176,7 +178,19 @@ export const MagicModalPortal: React.FC = memo(() => {
     });
   }, []);
 
-  useImperativeHandle(magicModalRef, () => ({
+  // 在组件挂载时注册portal
+  useEffect(() => {
+    // 注册当前portal
+    const portalId = registerPortal(localRef);
+    
+    // 在组件卸载时注销portal
+    return () => {
+      unregisterPortal(localRef);
+    };
+  }, []);
+
+  // 使用本地ref而不是全局ref
+  useImperativeHandle(localRef, () => ({
     show,
     hide,
     hideAll,

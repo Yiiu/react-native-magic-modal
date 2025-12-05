@@ -13,15 +13,42 @@ import {
   HideReturn,
 } from "../constants/types";
 
-export const magicModalRef = React.createRef<IModal>();
+// 改为ref数组，支持多个MagicModalPortal实例
+export const magicModalRefs: React.RefObject<IModal>[] = [];
 
-const getMagicModal = (): NonNullable<typeof magicModalRef.current> => {
-  if (!magicModalRef.current) {
-    throw new Error(
-      "MagicModalPortal not found. Please wrap your component with MagicModalPortal.",
-    );
+// 生成唯一ID
+export const generatePortalId = (): string => {
+  return `portal_${Math.random().toString(36).substring(7).toUpperCase()}_${Date.now()}`;
+};
+
+// 注册portal
+export const registerPortal = (ref: React.RefObject<IModal>): string => {
+  console.log(ref)
+  magicModalRefs.push(ref);
+  return generatePortalId();
+};
+
+// 注销portal
+export const unregisterPortal = (ref: React.RefObject<IModal>): void => {
+  const index = magicModalRefs.indexOf(ref);
+  if (index !== -1) {
+    magicModalRefs.splice(index, 1);
   }
-  return magicModalRef.current;
+};
+
+// 获取可用的magic modal实例，优先使用最后注册的可用实例
+const getMagicModal = (): NonNullable<IModal> => {
+  console.log(magicModalRefs)
+  // 从后往前查找第一个有current值的ref
+  for (let i = magicModalRefs.length - 1; i >= 0; i--) {
+    if (magicModalRefs[i]?.current) {
+      return magicModalRefs[i]?.current as NonNullable<IModal>;
+    }
+  }
+  
+  throw new Error(
+    "MagicModalPortal not found. Please wrap your component with MagicModalPortal.",
+  );
 };
 
 const show: GlobalShowFunction = (newComponent, newConfig) => {
@@ -43,7 +70,13 @@ const disableFullWindowOverlay: DisableFullWindowOverlayFunction = () => {
 const hideAll: GlobalHideAllFunction = () => {
   // We recommend using this method in jest, and having throw because the ref was not found isn't useful there.
   // Not all tests are necessarily using the provider.
-  return magicModalRef.current?.hideAll();
+  try {
+    return getMagicModal().hideAll();
+  } catch (error) {
+    // 静默失败，兼容测试环境
+    console.log("No MagicModalPortal found, but continuing anyway (for tests)");
+    return undefined;
+  }
 };
 export interface IModal {
   show: typeof show;

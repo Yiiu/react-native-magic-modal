@@ -41,5 +41,8 @@
   },
   "devDependencies": {
     "turbo": "^2.5.4"
+  },
+  "dependencies": {
+    "parse-path": "^7.1.0"
   }
 }

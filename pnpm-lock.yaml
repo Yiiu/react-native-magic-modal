@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      parse-path:
+        specifier: ^7.1.0
+        version: 7.1.0
     devDependencies:
       turbo:
         specifier: ^2.5.4
@@ -5687,6 +5691,9 @@ packages:
 
   parse-path@7.0.0:
     resolution: {integrity: sha512-Euf9GG8WT9CdqwuWJGdf3RkUcTBArppHABkO7Lm8IzRQp0e2r/kkFnmhu4TSK30Wcu5rVAZLmfPKSBBi9tWFog==}
+
+  parse-path@7.1.0:
+    resolution: {integrity: sha512-EuCycjZtfPcjWk7KTksnJ5xPMvWGA/6i4zrLYhRG0hGvC3GPU/jGUj3Cy+ZR0v30duV3e23R95T1lE2+lsndSw==}
 
   parse-png@2.1.0:
     resolution: {integrity: sha512-Nt/a5SfCLiTnQAjx3fHlqp8hRgTL3z7kTQZzvIMS9uCAepnCyjpdEc6M/sz69WqMBdaDBw9sF1F1UaHROYzGkQ==}
@@ -14291,6 +14298,10 @@ snapshots:
   parse-passwd@1.0.0: {}
 
   parse-path@7.0.0:
+    dependencies:
+      protocols: 2.0.1
+
+  parse-path@7.1.0:
     dependencies:
       protocols: 2.0.1
 
