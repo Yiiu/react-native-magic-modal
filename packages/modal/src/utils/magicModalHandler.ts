@@ -38,14 +38,13 @@ export const unregisterPortal = (ref: React.RefObject<IModal>): void => {
 
 // 获取可用的magic modal实例，优先使用最后注册的可用实例
 const getMagicModal = (): NonNullable<IModal> => {
-  console.log(magicModalRefs)
   // 从后往前查找第一个有current值的ref
   for (let i = magicModalRefs.length - 1; i >= 0; i--) {
     if (magicModalRefs[i]?.current) {
       return magicModalRefs[i]?.current as NonNullable<IModal>;
     }
   }
-  
+
   throw new Error(
     "MagicModalPortal not found. Please wrap your component with MagicModalPortal.",
   );
